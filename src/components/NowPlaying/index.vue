@@ -1,122 +1,50 @@
 <template lang="html">
   <div id="now-playing">
     <ul>
-      <li>
+      <li v-for="movie in movieList" :key = "movie.id">
         <div class="movie-pic">
-          <img src="@/assets/images/sample.jpg" alt="电影图片">
+          <img :src="movie.img | setWH('190.269')" alt="电影图片">
         </div>
         <div class="movie-info">
-          <h2>
-            电影名
-            <span v-show="true" class="threeD">3D <span class="max">MAX</span> </span>
-          </h2>
-          <p>观众评分</p>
-          <p>主演</p>
-          <p>今天XXxv家电影院放映XX场</p>
+          <h3>
+            {{movie.nm}}
+            <span v-show="movie.version==='v3d imax'"  class="threeD">3D <span class="max">MAX</span> </span>
+          </h3>
+          <p>观众评分：<span class="sc">{{movie.sc}}</span></p>
+          <p>主演：{{movie.star}}</p>
+          <p>{{movie.showInfo}}</p>
 
         </div>
         <div class="buyTicket">
           <button type="button" name="button">购票</button>
         </div>
       </li>
-      <li>
-        <div class="movie-pic">
-          <img src="@/assets/images/sample.jpg" alt="电影图片">
-        </div>
-        <div class="movie-info">
-          <h2>
-            电影名
-            <span v-show="true" class="threeD">3D <span class="max">MAX</span> </span>
-          </h2>
-          <p>观众评分</p>
-          <p>主演</p>
-          <p>今天XXxv家电影院放映XX场</p>
-
-        </div>
-        <div class="buyTicket">
-          <button type="button" name="button">购票</button>
-        </div>
-      </li>
-      <li>
-        <div class="movie-pic">
-          <img src="@/assets/images/sample.jpg" alt="电影图片">
-        </div>
-        <div class="movie-info">
-          <h2>
-            电影名
-            <span v-show="true" class="threeD">3D <span class="max">MAX</span> </span>
-          </h2>
-          <p>观众评分</p>
-          <p>主演</p>
-          <p>今天XXxv家电影院放映XX场</p>
-
-        </div>
-        <div class="buyTicket">
-          <button type="button" name="button">购票</button>
-        </div>
-      </li>
-      <li>
-        <div class="movie-pic">
-          <img src="@/assets/images/sample.jpg" alt="电影图片">
-        </div>
-        <div class="movie-info">
-          <h2>
-            电影名
-            <span v-show="true" class="threeD">3D <span class="max">MAX</span> </span>
-          </h2>
-          <p>观众评分</p>
-          <p>主演</p>
-          <p>今天XXxv家电影院放映XX场</p>
-
-        </div>
-        <div class="buyTicket">
-          <button type="button" name="button">购票</button>
-        </div>
-      </li>
-      <li>
-        <div class="movie-pic">
-          <img src="@/assets/images/sample.jpg" alt="电影图片">
-        </div>
-        <div class="movie-info">
-          <h2>
-            电影名
-            <span v-show="true" class="threeD">3D <span class="max">MAX</span> </span>
-          </h2>
-          <p>观众评分</p>
-          <p>主演</p>
-          <p>今天XXxv家电影院放映XX场</p>
-
-        </div>
-        <div class="buyTicket">
-          <button type="button" name="button">购票</button>
-        </div>
-      </li>
-      <li>
-        <div class="movie-pic">
-          <img src="@/assets/images/sample.jpg" alt="电影图片">
-        </div>
-        <div class="movie-info">
-          <h2>
-            电影名
-            <span v-show="true" class="threeD">3D <span class="max">MAX</span> </span>
-          </h2>
-          <p>观众评分</p>
-          <p>主演</p>
-          <p>今天XXxv家电影院放映XX场</p>
-
-        </div>
-        <div class="buyTicket">
-          <button type="button" name="button">购票</button>
-        </div>
-      </li>
-
     </ul>
   </div>
 </template>
 
 <script>
+import $ from '../../libs/util.js'
 export default {
   name:'NowPlaying',
+  data(){
+    return {
+      movieList:[],
+    };
+  },
+  methods:{
+
+  },
+  mounted(){
+    $.ajax.get('movieOnInfoList?cityId=10').then(res=>{
+      var msg = res.msg;
+      // console.log(res);
+      if(msg==='ok'){
+        this.movieList = res.data.movieList;
+        // console.log(this.movieList);
+      }
+    })
+  }
 }
 </script>
 
@@ -162,13 +90,17 @@ export default {
   font-size: 14px;
   padding-bottom: 3px;
 }
+#now-playing span.sc
+{
+  color:rgb(255, 161, 0);
+}
 #now-playing .buyTicket
 {
-  width: 20%;
+  width: 16%;
 }
 .buyTicket button
 {
-  padding: 5px;
+  padding: 3px;
   outline: none;
   background-color: #d65a31;
   border:0;

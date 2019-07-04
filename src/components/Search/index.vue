@@ -1,90 +1,61 @@
 <template lang="html">
   <div id="search">
     <div class="search-box">
-      <div class="search-sign">
-        <Icon type="md-search" size="25" color="#3c4757" />
-      </div>
       <div class="search-input">
-          <input type="text" name="" value="" placeholder="请输入查找内容">
+          <input type="text" name="" value="" placeholder="请输入查找内容" v-model="message">
+      </div>
+      <div class="search-btn">
+        <button type="button" name="button"><Icon type="md-search" size="25" color="#3c4757" /></button>
       </div>
     </div>
     <div class="search-result">
       <h3>电影/电视剧/综艺</h3>
       <ul class="search-list">
-        <li>
+        <li v-for="item in list">
           <div class="movie-pic">
-            <img src="@/assets/images/sample.jpg" alt="电影图片">
+            <img :src="item.img | setWH('190.269')" alt="电影图片">
           </div>
           <div class="movie-info">
             <h2>
-              电影名
+              {{item.nm}}
             </h2>
-            <p>XXXXXX</p>
-            <p>分类</p>
-            <p>2019-01-01</p>
+            <p>{{item.dir}}</p>
+            <p>{{item.cat}}</p>
+            <p>{{item.pubDesc}}</p>
           </div>
           <div class="movie-grade">
-            8.5
+            {{item.sc}}
           </div>
         </li>
 
-        <li>
-          <div class="movie-pic">
-            <img src="@/assets/images/sample.jpg" alt="电影图片">
-          </div>
-          <div class="movie-info">
-            <h2>
-              电影名
-            </h2>
-            <p>XXXXXX</p>
-            <p>分类</p>
-            <p>2019-01-01</p>
-          </div>
-          <div class="movie-grade">
-            8.5
-          </div>
-        </li>
-
-        <li>
-          <div class="movie-pic">
-            <img src="@/assets/images/sample.jpg" alt="电影图片">
-          </div>
-          <div class="movie-info">
-            <h2>
-              电影名
-            </h2>
-            <p>XXXXXX</p>
-            <p>分类</p>
-            <p>2019-01-01</p>
-          </div>
-          <div class="movie-grade">
-            8.5
-          </div>
-        </li>
-
-        <li>
-          <div class="movie-pic">
-            <img src="@/assets/images/sample.jpg" alt="电影图片">
-          </div>
-          <div class="movie-info">
-            <h2>
-              电影名
-            </h2>
-            <p>XXXXXX</p>
-            <p>分类</p>
-            <p>2019-01-01</p>
-          </div>
-          <div class="movie-grade">
-            8.5
-          </div>
-        </li>
       </ul>
     </div>
   </div>
 </template>
 
 <script>
+import $ from '../../libs/util.js'
 export default {
+  name:'Search',
+  data(){
+    return {
+      message:'',
+      list:[],
+    }
+  },
+  watch:{
+    message(newVal){//实际上需要在请求频繁时只保留最后一次请求
+      // console.log(newVal);
+      $.ajax.get('searchList?cityId=10&kw='+newVal).then(res=>{
+        if(res.msg === 'ok'){
+          if(res.data.movies){
+            this.list = res.data.movies.list;
+            // console.log(this.list);
+          }
+        }
+      });
+    }
+  },
 }
 </script>
 
@@ -104,16 +75,29 @@ export default {
   display: inline-block;
 
 }
-#search .search-box .search-sign
+#search .search-box .search-btn
 {
-  width: 25px;
+  display: inline-block;
+  width: 30px;
   position: absolute;
-  right:14%;
   z-index: 3;
+}
+#search .search-box .search-btn button
+{
+  border:0;
+  background-color: #fff;
+  border-radius: 5px;
+  margin-left:5px;
+}
+#search .search-box .search-btn button:active
+{
+  background-color: #e67c43;
+  border:0px;
 }
 #search .search-box .search-input
 {
-  width: 80%;
+  display: inline-block;
+  width: 75%;
   outline: none;
   box-shadow: none;
   margin-left:10%;
@@ -123,7 +107,7 @@ export default {
   font-size: 14px;
   height: 2em;
   border:1px solid #eeeeee;
-  border-radius: 10px;
+  border-radius:5px;
   transition-property: all;
   transition-duration: 300ms;
 }

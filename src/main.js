@@ -8,8 +8,10 @@ import 'iview/dist/styles/iview.css';
 import store from './store';
 import '../style.css';
 
-Vue.config.productionTip = false
 Vue.use(iView);
+Vue.filter('setWH',(url,arg)=>{
+  return url.replace(/w\.h/,arg);
+});
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
