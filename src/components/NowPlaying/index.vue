@@ -1,9 +1,10 @@
 <template lang="html">
-  <div id="now-playing">
+  <div id="now-playing" ref="movie_body">
     <ul>
+      <li class="pullDown">{{pullDownMessage}}</li>
       <li v-for="movie in movieList" :key = "movie.id">
         <div class="movie-pic">
-          <img :src="movie.img | setWH('190.269')" alt="电影图片">
+          <img :src="movie.img | setWH('190.269')" alt="电影图片" @tap="handleTap">
         </div>
         <div class="movie-info">
           <h3>
@@ -24,35 +25,69 @@
 </template>
 
 <script>
-import $ from '../../libs/util.js'
+import $ from '../../libs/util.js';
+import BScroll from 'better-scroll';
 export default {
   name:'NowPlaying',
   data(){
     return {
       movieList:[],
+      pullDownMessage:'',
+      prevCity:-1
     };
   },
-  methods:{
 
-  },
-  mounted(){
-    $.ajax.get('movieOnInfoList?cityId=10').then(res=>{
+  activated(){
+    // console.log(123);
+    var cityId = this.$store.state.city.id;
+    if(this.prevCity === cityId){ return ;}
+    $.ajax.get('movieOnInfoList?cityId=' + cityId).then(res=>{
       var msg = res.msg;
       // console.log(res);
       if(msg==='ok'){
         this.movieList = res.data.movieList;
-        // console.log(this.movieList);
+        this.prevCity = cityId;
+        this.$nextTick();//vue自带，保证数据赋值以后，渲染完毕后再往下执行
+        var scroll = new BScroll(this.$refs.movie_body,{
+          tap:true,
+          probeType:1
+        });
+        scroll.on('scroll',(pos)=>{
+          // console.log('scroll');
+          this.pullDownMessage = "正在更新数据"
+        });
+        scroll.on('touchEnd',(pos)=>{
+          if(pos.y>30){
+            $.ajax.get('movieOnInfoList?cityId=12').then(res => {
+              var msg = res.msg;
+              if(msg === 'ok'){
+                this.pullDownMessage = '更新成功';
+
+                  this.movieList = res.data.movieList;
+                  this.pullDownMessage = '';
+
+              }
+            })
+          }
+        })
+
       }
     })
-  }
+  },
+  methods:{
+    handleTap(){
+      console.log('tap');
+    }
+  },
 }
 </script>
 
 <style lang="css" scoped>
 #now-playing
 {
-  margin-top: 8em;
-  margin-bottom: 5em;
+  position: absolute;
+  top: 8em;
+  height:75vh;
 }
 #now-playing li
 {
@@ -62,6 +97,14 @@ export default {
   justify-content: center;
   margin-bottom: 5px;
   border-bottom: 1px solid #eeeeee;
+}
+#now-playing li.pullDown
+{
+  border: 0;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 #now-playing .movie-pic,#now-playing .movie-info,#now-playing .buyTicket
 {
@@ -122,4 +165,5 @@ span.threeD span.max
   background-color: #393e46;
   color:#eeeeee;
 }
+
 </style>

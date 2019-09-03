@@ -1,12 +1,12 @@
 <template lang="html">
-  <div id="city">
+  <div id="city" ref="city">
     <div class="city-detail">
       <div class="hotCity">
         <div class="title">
           热门城市
         </div>
         <div class="content">
-          <button type="button" name="button" v-for="hotCity in hotCityList">{{hotCity.nm}}</button>
+          <button type="button" name="button" v-for="hotCity in hotCityList" @tap="hanldeToCity(hotCity.nm,hotCity.id)">{{hotCity.nm}}</button>
         </div>
       </div>
       <div class="normalCity"  ref="city_sort">
@@ -17,7 +17,7 @@
                 {{city.index}}
               </div>
               <ul class="city-list">
-                <li v-for="item in city.list">{{item.nm}}</li>
+                <li @tap="hanldeToCity(item.nm,item.id)" v-for="item in city.list">{{item.nm}}</li>
               </ul>
             </li>
           </template>
@@ -34,6 +34,7 @@
 
 <script>
 import $ from '../../libs/util.js'
+import BScroll from 'better-scroll';
 export default {
   name:'City',
   data(){
@@ -43,6 +44,13 @@ export default {
     }
   },
   mounted(){
+    var cityList = window.localStorage.getItem('cityList');
+    var hotCityList = window.localStorage.getItem('hotCityList');
+    if(cityList && hotCityList){
+      this.cityList = JSON.parse(cityList);
+      this.hotCityList = JSON.parse(hotCityList);
+    }
+    else{
       $.ajax.get('cityList').then(res => {
         if (res.msg === 'ok') {
           var cities = res.data.cities;
@@ -50,13 +58,30 @@ export default {
           var {cityList,hotCityList}=this.formatCities(cities);
           this.cityList = cityList;
           this.hotCityList = hotCityList;
+          window.localStorage.setItem('cityList',JSON.stringify(cityList));//本地存储
+          window.localStorage.setItem('hotCityList',JSON.stringify(hotCityList));
         }
-    })
+      })
+    }
+    this.$nextTick();//vue自带，保证数据赋值以后，渲染完毕后再往下执行
+    var scroll = new BScroll(this.$refs.city,{
+      tap:true,
+      probeType:1
+    });
+
   },
   methods:{
+    hanldeToCity(nm,id){
+      // console.log(nm);
+      this.$store.commit('city/CITY_INFO',{ nm,id});
+      window.localStorage.setItem('nowCityNm',nm);
+      window.localStorage.setItem('nowCItyId',id);
+      this.$router.push('/movie/nowPlaying');
+    },
     handleToIndex(index){
       var title = this.$refs.city_sort.getElementsByClassName('title');
       document.documentElement.scrollTop = title[index].offsetTop - 7*14;
+      // document.getElementById('city').scrollTop = title[index].offsetTop;
     },
     formatCities(cities){
       var cityList = [];
@@ -118,7 +143,7 @@ export default {
   margin-top:7em;
   margin-bottom: 5em;
   font-size: 14px;
-  overflow: scroll;
+  height:100vh;
 }
 #city .city-detail
 {
@@ -152,9 +177,9 @@ export default {
   outline: none;
   border:1px solid #eee;
   border-radius: 8px;
-  padding: 8px;
+  padding: 6px;
   font-style: 14px;
-  width: 4em;
+  width: 3em;
   margin: 5px 15px;
   background-color: #fff;
 }
@@ -162,7 +187,8 @@ export default {
 {
   display: flex;
   flex-wrap:wrap;
+  margin:0 auto;
   justify-content: flex-start;
-  align-items:flex-start;
+  /* align-items:flex-start; */
 }
 </style>

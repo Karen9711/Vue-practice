@@ -4,7 +4,7 @@
     <div class="content">
       <div class="movie-menu">
         <router-link tag="div" to="/movie/city" class="city">
-          成都
+          {{ $store.state.city.nm }}
           <Icon type="md-arrow-dropdown" />
         </router-link>
         <router-link tag="div" to="/movie/nowPlaying" class="nowPlaying">
@@ -55,10 +55,18 @@ export default {
 {
   display: inline-block;
   font-size: 16px;
-  width: 23%;
+  width: 40%;
   padding-left: 10px;
   text-align: center;
   color: #222831;
+}
+.content .nowPlaying,.nowPlaying,.content .commingSoon
+{
+  width: 23%;
+}
+.content .search
+{
+  width: 5%;
 }
 .movie-menu .nowPlaying.router-link-active,.movie-menu .commingSoon.router-link-active,.movie-menu .city.router-link-active,.movie-menu .search.router-link-active
 {

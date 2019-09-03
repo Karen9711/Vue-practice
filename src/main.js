@@ -16,6 +16,7 @@ Vue.filter('setWH',(url,arg)=>{
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })
